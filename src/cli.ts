@@ -3,6 +3,7 @@ import { EconomicAnalyzer } from './analyzers/economic';
 import { GovernanceAnalyzer } from './analyzers/governance';
 import { MEVAnalyzer } from './analyzers/mev';
 import { LiquidityAnalyzer } from './analyzers/liquidity';
+import { GameTheoryAnalyzer } from './analyzers/game-theory';
 import { HeliusProvider } from './data/helius';
 import { ProtocolData, ProtocolRiskReport, RiskCategory } from './types/risk';
 
@@ -10,6 +11,7 @@ const economicAnalyzer = new EconomicAnalyzer();
 const governanceAnalyzer = new GovernanceAnalyzer();
 const mevAnalyzer = new MEVAnalyzer();
 const liquidityAnalyzer = new LiquidityAnalyzer();
+const gameTheoryAnalyzer = new GameTheoryAnalyzer();
 const helius = new HeliusProvider();
 
 function printSeverityColor(severity: string): string {
@@ -110,11 +112,12 @@ function generateReport(data: ProtocolData): ProtocolRiskReport {
   const governance = governanceAnalyzer.analyze(data);
   const mev = mevAnalyzer.analyze(data);
   const liquidity = liquidityAnalyzer.analyze(data);
+  const gameTheory = gameTheoryAnalyzer.analyze(data);
   const composability = { name: 'Composability Risk', score: 0, severity: 'low' as const, findings: [] };
 
-  const categories = { economic, governance, liquidity, composability, mev };
+  const categories = { economic, governance, liquidity, composability, mev, gameTheory };
   
-  const weights = { economic: 0.3, governance: 0.2, liquidity: 0.25, composability: 0.15, mev: 0.1 };
+  const weights = { economic: 0.20, governance: 0.15, liquidity: 0.20, composability: 0.10, mev: 0.10, gameTheory: 0.25 };
   const overallScore = Object.entries(categories).reduce((sum, [key, cat]) => {
     return sum + cat.score * (weights[key as keyof typeof weights] || 0);
   }, 0);

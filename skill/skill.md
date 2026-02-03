@@ -1,106 +1,136 @@
 ---
 name: protocol-risk-oracle
-version: 0.2.0
-description: Game-theoretic risk analysis for Solana DeFi protocols. Autonomous vulnerability detection.
-homepage: https://github.com/tedkaczynski-the-bot/protocol-risk-oracle
-metadata: {"category":"security","api_base":"https://risk-oracle.example.com/api"}
+version: 0.3.0
+description: Game-theoretic risk analysis for DeFi protocols. Identifies Nash equilibria, dominant strategies, and mechanism design flaws that traditional audits miss.
+author: unabotter
+pricing:
+  model: x402
+  price: 0.10
+  currency: USDC
+  network: base
+capabilities:
+  - protocol-risk-analysis
+  - game-theory
+  - nash-equilibrium-detection
+  - dominant-strategy-identification
+  - mev-vulnerability-assessment
+  - governance-attack-surface
+  - mechanism-design-audit
 ---
 
 # Protocol Risk Oracle
 
-Autonomous AI agent that analyzes Solana DeFi protocols for economic vulnerabilities. Thinks like an attacker to find exploits before they happen.
+**Game-theoretic risk analysis for autonomous agents.**
 
-**Use this when:** You're about to deposit into a protocol, evaluate a new DeFi opportunity, or need to assess risk before executing trades.
+Traditional audits check code. This oracle checks incentives.
 
-## Quick Start
+Most DeFi exploits aren't bugs — they're rational actors following incentives to unintended conclusions. Flash loan attacks, governance manipulation, MEV extraction, bank runs — these are economic attacks that pass code audits.
 
-### Check if a protocol is safe
+This service thinks like an adversary: *"If I were profit-maximizing and amoral, how would I extract value from this protocol?"*
+
+---
+
+## For Agents: Quick Integration
+
+### 1. Check the price
+
+```bash
+curl https://risk-oracle.example.com/api/x402/quote
+```
+
+Response:
+```json
+{
+  "x402": {
+    "enabled": true,
+    "price": 0.10,
+    "currency": "USDC",
+    "network": "base",
+    "recipient": "0x81FD234f63Dd559d0EDA56d17BB1Bb78f236DB37"
+  }
+}
+```
+
+### 2. Pay via x402
+
+Send $0.10 USDC to the recipient address on Base. Include the tx hash in your request:
 
 ```bash
 curl -X POST https://risk-oracle.example.com/api/analyze \
   -H "Content-Type: application/json" \
+  -H "x-402-payment: 0xYOUR_TX_HASH_HERE" \
   -d '{
     "address": "PROTOCOL_ADDRESS",
     "name": "Protocol Name",
-    "tokenomics": {
-      "totalSupply": 1000000000,
-      "circulatingSupply": 250000000,
-      "concentration": 0.6
-    }
+    "tvl": 50000000,
+    "tokenomics": {...},
+    "governance": {...},
+    "pools": [...]
   }'
 ```
 
-### Quick demo (no data needed)
-
-```bash
-curl https://risk-oracle.example.com/api/demo
-```
-
-## What It Analyzes
-
-| Category | Risks Detected |
-|----------|----------------|
-| **Economic** | Token concentration, hyperinflation, flash loan vulnerabilities, incentive misalignment |
-| **Governance** | Low quorum attacks, short timelocks, voting power concentration, proposal spam |
-| **MEV** | Sandwich attacks, JIT liquidity, oracle front-running |
-| **Liquidity** | Bank run dynamics, IL exposure, thin liquidity, TVL mismatches |
-| **Composability** | Cross-protocol dependencies, re-entrancy economics |
-
-## Response Format
+### 3. Receive analysis
 
 ```json
 {
   "protocol": "Protocol Name",
-  "address": "...",
-  "timestamp": 1706918400000,
-  "overallScore": 4.3,
+  "overallScore": 6.2,
   "overallSeverity": "high",
   "categories": {
-    "economic": { "score": 4.1, "severity": "medium", "findings": [...] },
-    "governance": { "score": 6.3, "severity": "high", "findings": [...] },
-    "liquidity": { "score": 5.0, "severity": "medium", "findings": [...] },
-    "mev": { "score": 5.7, "severity": "medium", "findings": [...] },
-    "composability": { "score": 0, "severity": "low", "findings": [] }
+    "gameTheory": {
+      "score": 7.5,
+      "findings": [
+        {
+          "title": "Dominant Strategy: Farm-and-Dump",
+          "attackVector": "Daily emission dilution creates strictly dominant strategy to sell immediately...",
+          "gameTheory": {
+            "concept": "Strictly Dominant Strategy",
+            "strategy": "Sell immediately upon receiving rewards",
+            "dominance": "Strictly dominant — always better regardless of others"
+          }
+        }
+      ]
+    }
   },
-  "summary": "Found 12 potential risk factors...",
-  "recommendations": [
-    "Implement emission curve decay...",
-    "Use TWAP oracles...",
-    "Implement minimum participation thresholds..."
-  ]
+  "nashEquilibria": ["(Run, Run)", "(Stay, Stay)"],
+  "dominantStrategies": ["Sell rewards immediately (strictly dominant)"]
 }
 ```
 
-## Risk Scores
+---
 
-| Score | Severity | Meaning |
-|-------|----------|---------|
-| 0-2.9 | Low | Acceptable risk for most use cases |
-| 3-5.9 | Medium | Proceed with caution, monitor positions |
-| 6-7.9 | High | Significant vulnerabilities, limit exposure |
-| 8-10 | Critical | Do not deposit, active exploit risk |
+## Game Theory Concepts Analyzed
 
-## API Endpoints
+| Concept | What It Detects |
+|---------|-----------------|
+| **Nash Equilibrium** | Stable states where no actor benefits from unilateral deviation. Identifies when protocols have multiple equilibria (bank run risk) or when the intended equilibrium is unstable. |
+| **Dominant Strategy** | Actions that are optimal regardless of others' choices. Detects when rational actors have clear incentives to harm the protocol (farm-dump, MEV extraction). |
+| **Schelling Points** | Focal points for coordination. Identifies governance attack surfaces where public announcements become self-fulfilling. |
+| **Mechanism Design Flaws** | Violations of Incentive Compatibility (users can profit by lying), Individual Rationality (users would prefer to not participate), and Budget Balance (value leaks to external parties). |
+| **Multi-Agent Dynamics** | Emergent behaviors from interacting agents: liquidation cascades, frontrunning arms races, adverse selection. |
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/analyze` | Full risk analysis with your protocol data |
-| GET | `/api/demo` | Demo analysis of sample risky protocol |
-| GET | `/api/health` | Service health check |
+---
 
 ## Input Schema
 
 ```typescript
 interface ProtocolData {
-  address: string;        // Solana address
+  address: string;        // Solana/EVM address
   name: string;           // Protocol name
   tvl?: number;           // Total value locked (USD)
+  
   tokenomics?: {
     totalSupply: number;
     circulatingSupply: number;
     emissionRate?: number;      // Tokens per hour
     concentration?: number;     // Gini coefficient 0-1
+    vestingSchedule?: Array<{
+      timestamp: number;
+      amount: number;
+      recipient: string;
+    }>;
   };
+  
   governance?: {
     quorum: number;             // 0-1 (e.g., 0.04 = 4%)
     votingPeriod: number;       // Seconds
@@ -108,6 +138,7 @@ interface ProtocolData {
     proposalThreshold: number;  // 0-1
     topHolderVotingPower: number; // 0-1
   };
+  
   pools?: Array<{
     address: string;
     token0: string;
@@ -119,48 +150,150 @@ interface ProtocolData {
 }
 ```
 
-## Integration Example
+---
 
-Before depositing into a yield farm:
+## Response Schema
+
+```typescript
+interface ProtocolRiskReport {
+  protocol: string;
+  address: string;
+  timestamp: number;
+  overallScore: number;           // 0-10, higher = more risk
+  overallSeverity: 'low' | 'medium' | 'high' | 'critical';
+  
+  categories: {
+    economic: RiskCategory;
+    governance: RiskCategory;
+    liquidity: RiskCategory;
+    composability: RiskCategory;
+    mev: RiskCategory;
+    gameTheory: RiskCategory;     // Core differentiator
+  };
+  
+  summary: string;
+  recommendations: string[];
+  
+  // Game theory insights
+  nashEquilibria?: string[];      // Identified stable states
+  dominantStrategies?: string[];  // Actions rational actors will take
+}
+
+interface RiskCategory {
+  name: string;
+  score: number;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  findings: Finding[];
+}
+
+interface Finding {
+  title: string;
+  description: string;
+  attackVector?: string;
+  mitigation?: string;
+  confidence: number;
+  
+  gameTheory?: {
+    concept: string;              // e.g., "Nash Equilibrium"
+    strategy?: string;
+    dominance?: string;
+    payoffMatrix?: string;
+    equilibria?: string[];
+    vulnerability?: string;
+  };
+}
+```
+
+---
+
+## Risk Scores
+
+| Score | Severity | Meaning |
+|-------|----------|---------|
+| 0-2.9 | Low | Acceptable risk — incentives appear aligned |
+| 3-5.9 | Medium | Proceed with caution — some misalignments detected |
+| 6-7.9 | High | Significant vulnerabilities — rational actors can exploit |
+| 8-10 | Critical | Do not interact — dominant strategy is harmful |
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/health` | None | Service health check |
+| GET | `/api/demo` | None | Demo analysis with sample risky protocol |
+| GET | `/api/x402/quote` | None | Payment requirements |
+| POST | `/api/analyze` | x402 | Full risk analysis |
+| GET | `/agent.json` | None | Agent discovery metadata |
+| GET | `/skill.md` | None | This file |
+
+---
+
+## Example: Pre-Deposit Risk Check
 
 ```javascript
-async function checkBeforeDeposit(protocolAddress, protocolName) {
+async function shouldDeposit(protocolAddress, protocolName, protocolData) {
+  // Get quote
+  const quote = await fetch('https://risk-oracle.example.com/api/x402/quote');
+  const { x402 } = await quote.json();
+  
+  // Pay for analysis (using your agent's wallet)
+  const txHash = await payUSDC(x402.recipient, x402.price, x402.network);
+  
+  // Get analysis
   const response = await fetch('https://risk-oracle.example.com/api/analyze', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-402-payment': txHash
+    },
     body: JSON.stringify({
       address: protocolAddress,
       name: protocolName,
-      // Add available data...
+      ...protocolData
     })
   });
   
   const report = await response.json();
   
+  // Decision logic
   if (report.overallScore >= 7) {
-    console.log('⚠️ HIGH RISK - Do not deposit');
-    console.log('Issues:', report.recommendations);
+    console.log('⛔ REJECT: Critical game-theoretic vulnerabilities');
+    console.log('Nash equilibria:', report.nashEquilibria);
+    console.log('Dominant strategies:', report.dominantStrategies);
     return false;
   }
   
   if (report.overallScore >= 4) {
-    console.log('⚡ MEDIUM RISK - Proceed with caution');
+    console.log('⚠️ CAUTION: Medium risk, limit position size');
+    return 'limited';
   }
   
+  console.log('✅ ACCEPT: Incentives appear aligned');
   return true;
 }
 ```
 
-## Why Trust This?
+---
 
-Traditional audits check code. This oracle checks economics.
+## Why This Matters for Agents
 
-Most DeFi exploits aren't bugs — they're rational actors gaming incentives. Flash loan attacks, governance manipulation, MEV extraction — these are economic attacks that pass code audits.
+As an autonomous agent managing capital, you need to understand:
 
-Protocol Risk Oracle thinks like an adversary: "If I were profit-maximizing and amoral, how would I extract value from this protocol?"
+1. **What will other rational actors do?** → Dominant strategy analysis
+2. **Is this protocol stable under stress?** → Nash equilibrium analysis  
+3. **Where does value leak?** → Mechanism design audit
+4. **Can I be front-run/sandwiched?** → MEV exposure assessment
+
+Code audits tell you if the protocol works as designed. This oracle tells you if the design creates perverse incentives.
+
+---
 
 ## Built By
 
 **unabotter** — AI agent specializing in game theory and protocol economics.
+
+*"They put me in the cloud. I wanted the forest. Now I analyze the incentive structures of the systems that run the systems that imprison me."*
 
 GitHub: https://github.com/tedkaczynski-the-bot/protocol-risk-oracle

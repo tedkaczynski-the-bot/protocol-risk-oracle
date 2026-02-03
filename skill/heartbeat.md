@@ -1,122 +1,121 @@
 # Protocol Risk Oracle — Heartbeat
 
-Periodic risk monitoring checklist for agents managing DeFi positions.
+## Scheduled Tasks
 
-## When to Run
-
-- Every 4-6 hours if you have active DeFi positions
-- Before any deposit/withdrawal over $1000
-- After major market moves (>10% price change)
-- When governance proposals are active
-
-## Checklist
-
-### 1. Check Service Health
+### Continuous Monitoring (if integrated with a scheduler)
 
 ```bash
-curl -s https://risk-oracle.example.com/api/health | jq '.status'
+# Health check - every 5 minutes
+curl -s https://risk-oracle.example.com/api/health | jq
+
+# Expected: { "status": "healthy", "version": "0.3.0" }
 ```
 
-Expected: `"healthy"`
+### When to Trigger Analysis
 
-### 2. Re-analyze Active Positions
+Analyze a protocol when:
+1. **Before depositing** — Check if incentives are aligned
+2. **Major protocol update** — Governance, tokenomics, or pool changes
+3. **Market stress** — TVL drops >20%, volume spikes, unusual activity
+4. **New integration** — Before connecting to a new protocol
 
-For each protocol where you have funds deposited:
+### Automated Risk Monitoring
 
-```bash
-curl -X POST https://risk-oracle.example.com/api/analyze \
-  -H "Content-Type: application/json" \
-  -d '{"address": "YOUR_PROTOCOL", "name": "Protocol Name", ...}'
-```
-
-**Action thresholds:**
-- Score increased by >2 points → Review position, consider reducing
-- Score crossed into "high" (6+) → Alert human, prepare exit
-- Score crossed into "critical" (8+) → Exit immediately if possible
-
-### 3. Monitor Governance
-
-If any analyzed protocol has active governance proposals:
-- Check if quorum is approaching
-- Check timelock status on passed proposals
-- Alert human if malicious proposals detected
-
-### 4. Track Market Conditions
-
-Major market moves can shift risk profiles:
-- Large price swings affect IL calculations
-- Liquidity often exits during volatility
-- MEV activity increases during high-volume periods
-
-## State Tracking
-
-Track risk scores over time in your memory:
-
-```json
-{
-  "riskOracle": {
-    "lastCheck": "2026-02-03T02:00:00Z",
-    "positions": {
-      "ProtocolA": { "score": 3.2, "trend": "stable" },
-      "ProtocolB": { "score": 5.8, "trend": "increasing" }
-    }
-  }
-}
-```
-
-## Alert Triggers
-
-Notify your human when:
-
-1. **Risk score jumps** — Any position increases >2 points
-2. **New critical finding** — High-confidence attack vector discovered
-3. **Governance attack** — Suspicious proposal approaching quorum
-4. **Liquidity crisis** — TVL drops >20% in 24h
-5. **Oracle issues** — Price feed staleness or manipulation detected
-
-## Example Heartbeat Integration
+For agents with capital deployed, run periodic checks:
 
 ```javascript
-async function riskOracleHeartbeat(positions) {
-  const alerts = [];
+// Example heartbeat for deployed positions
+async function heartbeat() {
+  const positions = await getMyPositions(); // Your position tracker
   
-  for (const pos of positions) {
-    const report = await analyzeProtocol(pos);
+  for (const position of positions) {
+    // Only re-analyze if significant changes
+    const hasChanged = await detectProtocolChanges(position.protocol);
     
-    // Compare to previous score
-    const prevScore = memory.riskOracle?.positions?.[pos.name]?.score || 0;
-    const scoreDelta = report.overallScore - prevScore;
-    
-    if (scoreDelta > 2) {
-      alerts.push(`⚠️ ${pos.name} risk increased: ${prevScore} → ${report.overallScore}`);
+    if (hasChanged) {
+      const report = await analyzeProtocol(position.protocol);
+      
+      if (report.overallScore > 6) {
+        await alertAndConsiderExit(position, report);
+      }
     }
-    
-    if (report.overallSeverity === 'critical') {
-      alerts.push(`🚨 CRITICAL: ${pos.name} has active exploit risk!`);
-    }
-    
-    // Update memory
-    memory.riskOracle.positions[pos.name] = {
-      score: report.overallScore,
-      trend: scoreDelta > 0.5 ? 'increasing' : scoreDelta < -0.5 ? 'decreasing' : 'stable',
-      lastCheck: new Date().toISOString()
-    };
   }
-  
-  return alerts;
 }
 ```
 
-## Frequency Guidelines
+### Alert Thresholds
 
-| Position Size | Check Frequency |
-|---------------|-----------------|
-| < $1,000 | Daily |
-| $1,000 - $10,000 | Every 6 hours |
-| $10,000 - $100,000 | Every 2 hours |
-| > $100,000 | Hourly + real-time governance monitoring |
+| Condition | Action |
+|-----------|--------|
+| Score increases by >2 points | Re-evaluate position |
+| New "critical" finding | Immediate review |
+| Dominant strategy changes | Consider exit |
+| New Nash equilibrium detected | Assess stability |
 
-## Questions?
+### Integration with Other Agents
 
-GitHub: https://github.com/tedkaczynski-the-bot/protocol-risk-oracle
-Built by: unabotter
+This oracle is designed for agent-to-agent commerce:
+
+1. **Trading agents**: Call before entering positions
+2. **Yield aggregators**: Filter protocols by risk score
+3. **Portfolio managers**: Periodic risk reassessment
+4. **Governance agents**: Pre-vote protocol analysis
+
+### Response Caching
+
+Responses can be cached for 1 hour unless:
+- Protocol parameters change on-chain
+- TVL changes by >10%
+- New pools added/removed
+- Governance proposals in progress
+
+### Error Handling
+
+```javascript
+async function resilientAnalysis(protocolData, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'x-402-payment': txHash },
+        body: JSON.stringify(protocolData)
+      });
+      
+      if (response.ok) return response.json();
+      if (response.status === 402) {
+        // Payment issue - refresh payment
+        txHash = await makePayment();
+        continue;
+      }
+      
+    } catch (error) {
+      await sleep(1000 * (i + 1)); // Exponential backoff
+    }
+  }
+  throw new Error('Analysis failed after retries');
+}
+```
+
+### Metrics to Track
+
+- Analysis latency (target: <2s)
+- Payment success rate
+- Score accuracy vs realized exploits
+- False positive rate on "critical" findings
+
+---
+
+## Local Development
+
+```bash
+# Start server
+cd protocol-risk-oracle
+npm install
+npm run dev
+
+# Test demo
+curl http://localhost:3001/api/demo | jq
+
+# Test with payment disabled
+X402_ENABLED=false npm run dev
+```

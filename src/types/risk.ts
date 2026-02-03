@@ -11,6 +11,27 @@ export interface Finding {
   attackVector?: string;
   mitigation?: string;
   confidence: number; // 0-1
+  gameTheory?: GameTheoryContext;
+}
+
+export interface GameTheoryContext {
+  concept: string; // e.g., "Nash Equilibrium", "Dominant Strategy"
+  strategy?: string;
+  dominance?: string;
+  payoffMatrix?: string;
+  equilibria?: string[];
+  vulnerability?: string;
+  mechanism?: string;
+  outcome?: string;
+  attack?: string;
+  cost?: string;
+  violation?: string;
+  fix?: string;
+  leakage?: string;
+  impact?: string;
+  asymmetry?: string;
+  centralisation?: string;
+  amplifiers?: string[];
 }
 
 export interface ProtocolRiskReport {
@@ -25,9 +46,12 @@ export interface ProtocolRiskReport {
     liquidity: RiskCategory;
     composability: RiskCategory;
     mev: RiskCategory;
+    gameTheory: RiskCategory;
   };
   summary: string;
   recommendations: string[];
+  nashEquilibria?: string[];
+  dominantStrategies?: string[];
 }
 
 export interface ProtocolData {
