@@ -6,12 +6,14 @@ const governance_1 = require("./analyzers/governance");
 const mev_1 = require("./analyzers/mev");
 const liquidity_1 = require("./analyzers/liquidity");
 const game_theory_1 = require("./analyzers/game-theory");
+const composability_1 = require("./analyzers/composability");
 const helius_1 = require("./data/helius");
 const economicAnalyzer = new economic_1.EconomicAnalyzer();
 const governanceAnalyzer = new governance_1.GovernanceAnalyzer();
 const mevAnalyzer = new mev_1.MEVAnalyzer();
 const liquidityAnalyzer = new liquidity_1.LiquidityAnalyzer();
 const gameTheoryAnalyzer = new game_theory_1.GameTheoryAnalyzer();
+const composabilityAnalyzer = new composability_1.ComposabilityAnalyzer();
 const helius = new helius_1.HeliusProvider();
 function printSeverityColor(severity) {
     const colors = {
@@ -97,7 +99,7 @@ function generateReport(data) {
     const mev = mevAnalyzer.analyze(data);
     const liquidity = liquidityAnalyzer.analyze(data);
     const gameTheory = gameTheoryAnalyzer.analyze(data);
-    const composability = { name: 'Composability Risk', score: 0, severity: 'low', findings: [] };
+    const composability = composabilityAnalyzer.analyze(data);
     const categories = { economic, governance, liquidity, composability, mev, gameTheory };
     const weights = { economic: 0.20, governance: 0.15, liquidity: 0.20, composability: 0.10, mev: 0.10, gameTheory: 0.25 };
     const overallScore = Object.entries(categories).reduce((sum, [key, cat]) => {

@@ -6,6 +6,7 @@ import { GovernanceAnalyzer } from './analyzers/governance';
 import { MEVAnalyzer } from './analyzers/mev';
 import { LiquidityAnalyzer } from './analyzers/liquidity';
 import { GameTheoryAnalyzer } from './analyzers/game-theory';
+import { ComposabilityAnalyzer } from './analyzers/composability';
 import { ProtocolRiskReport, ProtocolData, Finding } from './types/risk';
 
 const app = express();
@@ -17,6 +18,7 @@ const governanceAnalyzer = new GovernanceAnalyzer();
 const mevAnalyzer = new MEVAnalyzer();
 const liquidityAnalyzer = new LiquidityAnalyzer();
 const gameTheoryAnalyzer = new GameTheoryAnalyzer();
+const composabilityAnalyzer = new ComposabilityAnalyzer();
 
 // ============================================================================
 // X402 PAYMENT LAYER
@@ -130,7 +132,7 @@ function analyzeProtocol(data: ProtocolData): ProtocolRiskReport {
   const gameTheory = gameTheoryAnalyzer.analyze(data);
   
   // Placeholder for composability (TODO: implement)
-  const composability = { name: 'Composability Risk', score: 0, severity: 'low' as const, findings: [] };
+  const composability = composabilityAnalyzer.analyze(data);
 
   const categories = { economic, governance, liquidity, composability, mev, gameTheory };
   

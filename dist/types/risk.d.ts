@@ -30,6 +30,7 @@ export interface GameTheoryContext {
     asymmetry?: string;
     centralisation?: string;
     amplifiers?: string[];
+    examples?: string[];
 }
 export interface ProtocolRiskReport {
     protocol: string;

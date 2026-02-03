@@ -4,6 +4,7 @@ import { GovernanceAnalyzer } from '../src/analyzers/governance';
 import { MEVAnalyzer } from '../src/analyzers/mev';
 import { LiquidityAnalyzer } from '../src/analyzers/liquidity';
 import { GameTheoryAnalyzer } from '../src/analyzers/game-theory';
+import { ComposabilityAnalyzer } from '../src/analyzers/composability';
 import { ProtocolRiskReport, ProtocolData, Finding } from '../src/types/risk';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -14,6 +15,7 @@ const governanceAnalyzer = new GovernanceAnalyzer();
 const mevAnalyzer = new MEVAnalyzer();
 const liquidityAnalyzer = new LiquidityAnalyzer();
 const gameTheoryAnalyzer = new GameTheoryAnalyzer();
+const composabilityAnalyzer = new ComposabilityAnalyzer();
 
 // X402 config
 const x402Config = {
@@ -29,7 +31,7 @@ function analyzeProtocol(data: ProtocolData): ProtocolRiskReport {
   const mev = mevAnalyzer.analyze(data);
   const liquidity = liquidityAnalyzer.analyze(data);
   const gameTheory = gameTheoryAnalyzer.analyze(data);
-  const composability = { name: 'Composability Risk', score: 0, severity: 'low' as const, findings: [] };
+  const composability = composabilityAnalyzer.analyze(data);
 
   const categories = { economic, governance, liquidity, composability, mev, gameTheory };
   

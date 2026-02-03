@@ -45,6 +45,7 @@ const governance_1 = require("./analyzers/governance");
 const mev_1 = require("./analyzers/mev");
 const liquidity_1 = require("./analyzers/liquidity");
 const game_theory_1 = require("./analyzers/game-theory");
+const composability_1 = require("./analyzers/composability");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 // Initialize analyzers
@@ -53,6 +54,7 @@ const governanceAnalyzer = new governance_1.GovernanceAnalyzer();
 const mevAnalyzer = new mev_1.MEVAnalyzer();
 const liquidityAnalyzer = new liquidity_1.LiquidityAnalyzer();
 const gameTheoryAnalyzer = new game_theory_1.GameTheoryAnalyzer();
+const composabilityAnalyzer = new composability_1.ComposabilityAnalyzer();
 const x402Config = {
     enabled: process.env.X402_ENABLED === 'true',
     pricePerAnalysis: parseFloat(process.env.X402_PRICE || '0.10'), // $0.10 default
@@ -143,7 +145,7 @@ function analyzeProtocol(data) {
     const liquidity = liquidityAnalyzer.analyze(data);
     const gameTheory = gameTheoryAnalyzer.analyze(data);
     // Placeholder for composability (TODO: implement)
-    const composability = { name: 'Composability Risk', score: 0, severity: 'low', findings: [] };
+    const composability = composabilityAnalyzer.analyze(data);
     const categories = { economic, governance, liquidity, composability, mev, gameTheory };
     // Calculate overall score (weighted average - game theory gets significant weight)
     const weights = {

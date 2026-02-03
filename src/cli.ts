@@ -4,6 +4,7 @@ import { GovernanceAnalyzer } from './analyzers/governance';
 import { MEVAnalyzer } from './analyzers/mev';
 import { LiquidityAnalyzer } from './analyzers/liquidity';
 import { GameTheoryAnalyzer } from './analyzers/game-theory';
+import { ComposabilityAnalyzer } from './analyzers/composability';
 import { HeliusProvider } from './data/helius';
 import { ProtocolData, ProtocolRiskReport, RiskCategory } from './types/risk';
 
@@ -12,6 +13,7 @@ const governanceAnalyzer = new GovernanceAnalyzer();
 const mevAnalyzer = new MEVAnalyzer();
 const liquidityAnalyzer = new LiquidityAnalyzer();
 const gameTheoryAnalyzer = new GameTheoryAnalyzer();
+const composabilityAnalyzer = new ComposabilityAnalyzer();
 const helius = new HeliusProvider();
 
 function printSeverityColor(severity: string): string {
@@ -113,7 +115,7 @@ function generateReport(data: ProtocolData): ProtocolRiskReport {
   const mev = mevAnalyzer.analyze(data);
   const liquidity = liquidityAnalyzer.analyze(data);
   const gameTheory = gameTheoryAnalyzer.analyze(data);
-  const composability = { name: 'Composability Risk', score: 0, severity: 'low' as const, findings: [] };
+  const composability = composabilityAnalyzer.analyze(data);
 
   const categories = { economic, governance, liquidity, composability, mev, gameTheory };
   
