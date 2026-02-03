@@ -1,21 +1,25 @@
 import express from 'express';
 import { EconomicAnalyzer } from './analyzers/economic';
+import { GovernanceAnalyzer } from './analyzers/governance';
+import { MEVAnalyzer } from './analyzers/mev';
 import { ProtocolRiskReport, ProtocolData } from './types/risk';
 
 const app = express();
 app.use(express.json());
 
 const economicAnalyzer = new EconomicAnalyzer();
+const governanceAnalyzer = new GovernanceAnalyzer();
+const mevAnalyzer = new MEVAnalyzer();
 
 // Generate full risk report for a protocol
 function analyzeProtocol(data: ProtocolData): ProtocolRiskReport {
   const economic = economicAnalyzer.analyze(data);
+  const governance = governanceAnalyzer.analyze(data);
+  const mev = mevAnalyzer.analyze(data);
   
-  // Placeholder for other analyzers (to be implemented)
-  const governance = { name: 'Governance Risk', score: 0, severity: 'low' as const, findings: [] };
+  // Placeholder for remaining analyzers
   const liquidity = { name: 'Liquidity Risk', score: 0, severity: 'low' as const, findings: [] };
   const composability = { name: 'Composability Risk', score: 0, severity: 'low' as const, findings: [] };
-  const mev = { name: 'MEV Risk', score: 0, severity: 'low' as const, findings: [] };
 
   const categories = { economic, governance, liquidity, composability, mev };
   
@@ -64,19 +68,27 @@ app.post('/api/analyze', (req, res) => {
 });
 
 app.get('/api/demo', (req, res) => {
-  // Demo analysis with sample data
+  // Demo analysis with sample data - a deliberately risky protocol
   const sampleProtocol: ProtocolData = {
     address: 'DemoProtocol111111111111111111111111111111111',
-    name: 'Demo Protocol',
+    name: 'Risky DeFi Protocol',
     tvl: 50000000,
     tokenomics: {
       totalSupply: 1000000000,
       circulatingSupply: 250000000,
-      emissionRate: 100000, // per hour
-      concentration: 0.75
+      emissionRate: 100000, // per hour - very high!
+      concentration: 0.75 // high concentration
+    },
+    governance: {
+      quorum: 0.03, // 3% - very low
+      votingPeriod: 3 * 24 * 3600, // 3 days
+      timelockDelay: 12 * 3600, // 12 hours - short
+      proposalThreshold: 0.01,
+      topHolderVotingPower: 0.45 // 45% - high concentration
     },
     pools: [
-      { address: 'pool1', token0: 'SOL', token1: 'DEMO', liquidity: 50000, volume24h: 45000, fees: 0.003 }
+      { address: 'pool1', token0: 'SOL', token1: 'DEMO', liquidity: 50000, volume24h: 45000, fees: 0.003 },
+      { address: 'pool2', token0: 'USDC', token1: 'DEMO', liquidity: 200000, volume24h: 150000, fees: 0.001 }
     ]
   };
   
