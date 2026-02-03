@@ -1,6 +1,21 @@
 # Protocol Risk Oracle
 
-An autonomous AI agent that analyzes Solana DeFi protocols for economic vulnerabilities and publishes risk assessments on-chain.
+An autonomous AI agent that analyzes Solana DeFi protocols for economic vulnerabilities and publishes risk assessments.
+
+## For Agents
+
+| File | URL | Purpose |
+|------|-----|---------|
+| **skill.md** | `/skill.md` | Full API reference, integration guide |
+| **heartbeat.md** | `/heartbeat.md` | Periodic monitoring checklist |
+
+```bash
+# Fetch skill file
+curl https://risk-oracle.example.com/skill.md
+
+# Quick risk check
+curl https://risk-oracle.example.com/api/demo
+```
 
 ## What It Does
 

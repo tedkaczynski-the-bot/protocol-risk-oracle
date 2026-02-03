@@ -105,3 +105,25 @@ app.listen(PORT, () => {
 });
 
 export { analyzeProtocol };
+
+// Serve skill files for agent discovery
+import * as fs from 'fs';
+import * as path from 'path';
+
+app.get('/skill.md', (req, res) => {
+  const skillPath = path.join(__dirname, '../skill/skill.md');
+  if (fs.existsSync(skillPath)) {
+    res.type('text/markdown').send(fs.readFileSync(skillPath, 'utf-8'));
+  } else {
+    res.status(404).send('Skill file not found');
+  }
+});
+
+app.get('/heartbeat.md', (req, res) => {
+  const hbPath = path.join(__dirname, '../skill/heartbeat.md');
+  if (fs.existsSync(hbPath)) {
+    res.type('text/markdown').send(fs.readFileSync(hbPath, 'utf-8'));
+  } else {
+    res.status(404).send('Heartbeat file not found');
+  }
+});
