@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #09090b;
+  --bg-elevated: #18181b;
+  --bg-surface: #27272a;
+  --border: #3f3f46;
+  --border-active: #52525b;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-dim: #71717a;
+  --accent: #22c55e;
+  --accent-dim: #16a34a;
+  --warning: #eab308;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+input, textarea, select {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  padding: 0.75rem !important;
+  width: 100%;
+  border-radius: 4px !important;
+  transition: border-color 0.15s;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none !important;
+  border-color: var(--accent) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-dim) !important;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+pre, code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Solana wallet adapter overrides */
+.wallet-adapter-button {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 4px !important;
+  height: auto !important;
+  line-height: 1.5 !important;
+}
+
+.wallet-adapter-button:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: transparent !important;
+}
+
+.wallet-adapter-button-trigger {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--bg) !important;
+}
+
+.wallet-adapter-button-trigger:hover {
+  background: var(--accent-dim) !important;
+  border-color: var(--accent-dim) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+
+.wallet-adapter-modal-title {
+  color: var(--text) !important;
+}
+
+.wallet-adapter-modal-list li {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px !important;
+}
+
+.wallet-adapter-modal-list li:hover {
+  border-color: var(--accent) !important;
+}
+
+.wallet-adapter-modal-list-more {
+  color: var(--text-muted) !important;
+}

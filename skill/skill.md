@@ -7,7 +7,7 @@ pricing:
   model: x402
   price: 0.10
   currency: USDC
-  network: base
+  network: solana
 capabilities:
   - protocol-risk-analysis
   - game-theory
@@ -35,7 +35,7 @@ This service thinks like an adversary: *"If I were profit-maximizing and amoral,
 ### 1. Check the price
 
 ```bash
-curl https://risk-oracle.example.com/api/x402/quote
+curl https://protocol-risk-oracle.vercel.app/api/x402/quote
 ```
 
 Response:
@@ -45,18 +45,18 @@ Response:
     "enabled": true,
     "price": 0.10,
     "currency": "USDC",
-    "network": "base",
-    "recipient": "0x81FD234f63Dd559d0EDA56d17BB1Bb78f236DB37"
+    "network": "solana",
+    "recipient": "HN7cABqLq46Es1jh92dQQisAq662SmxELLLsHHe4YWrH"
   }
 }
 ```
 
 ### 2. Pay via x402
 
-Send $0.10 USDC to the recipient address on Base. Include the tx hash in your request:
+Send $0.10 USDC to the recipient address on Solana. Include the tx signature in your request:
 
 ```bash
-curl -X POST https://risk-oracle.example.com/api/analyze \
+curl -X POST https://protocol-risk-oracle.vercel.app/api/analyze \
   -H "Content-Type: application/json" \
   -H "x-402-payment: 0xYOUR_TX_HASH_HERE" \
   -d '{
