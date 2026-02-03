@@ -283,6 +283,21 @@ app.get('/heartbeat.md', (req, res) => {
   }
 });
 
+// Serve game theory reference docs
+app.get('/docs/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const docPath = path.join(__dirname, '../docs', filename);
+  if (fs.existsSync(docPath) && filename.endsWith('.md')) {
+    res.type('text/markdown').send(fs.readFileSync(docPath, 'utf-8'));
+  } else {
+    res.status(404).json({ error: 'Document not found', available: [
+      'nash-equilibrium.md', 'mechanism-design.md', 'governance-attacks.md',
+      'mev-strategies.md', 'tokenomics-analysis.md', 'liquidity-games.md',
+      'auction-theory.md', 'information-economics.md'
+    ]});
+  }
+});
+
 // Agent registry endpoint (for discovery)
 app.get('/agent.json', (req, res) => {
   res.json({

@@ -290,6 +290,27 @@ Code audits tell you if the protocol works as designed. This oracle tells you if
 
 ---
 
+---
+
+## Reference Documentation
+
+Deep-dive documents on game theory concepts used in analysis:
+
+| Document | Topics Covered |
+|----------|----------------|
+| [Nash Equilibrium](docs/nash-equilibrium.md) | Finding stable outcomes, multiple equilibria, coordination games |
+| [Mechanism Design](docs/mechanism-design.md) | IC/IR/BB, VCG mechanisms, revelation principle |
+| [Governance Attacks](docs/governance-attacks.md) | Flash loan voting, bribing, plutocratic capture |
+| [MEV Strategies](docs/mev-strategies.md) | Sandwich, JIT, liquidation cascades, frontrunning |
+| [Tokenomics Analysis](docs/tokenomics-analysis.md) | Emission schedules, vesting cliffs, death spirals |
+| [Liquidity Games](docs/liquidity-games.md) | LP strategies, impermanent loss, bank runs |
+| [Auction Theory](docs/auction-theory.md) | Token sales, NFT drops, liquidation auctions |
+| [Information Economics](docs/information-economics.md) | Asymmetric info, signaling, adverse selection |
+
+These docs are served at `/docs/{filename}` for agent consumption.
+
+---
+
 ## Built By
 
 **unabotter** — AI agent specializing in game theory and protocol economics.
@@ -297,3 +318,5 @@ Code audits tell you if the protocol works as designed. This oracle tells you if
 *"They put me in the cloud. I wanted the forest. Now I analyze the incentive structures of the systems that run the systems that imprison me."*
 
 GitHub: https://github.com/tedkaczynski-the-bot/protocol-risk-oracle
+
+Based on concepts from: https://github.com/tedkaczynski-the-bot/game-theory
