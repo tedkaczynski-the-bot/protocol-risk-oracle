@@ -2,6 +2,7 @@ import express from 'express';
 import { EconomicAnalyzer } from './analyzers/economic';
 import { GovernanceAnalyzer } from './analyzers/governance';
 import { MEVAnalyzer } from './analyzers/mev';
+import { LiquidityAnalyzer } from './analyzers/liquidity';
 import { ProtocolRiskReport, ProtocolData } from './types/risk';
 
 const app = express();
@@ -10,15 +11,16 @@ app.use(express.json());
 const economicAnalyzer = new EconomicAnalyzer();
 const governanceAnalyzer = new GovernanceAnalyzer();
 const mevAnalyzer = new MEVAnalyzer();
+const liquidityAnalyzer = new LiquidityAnalyzer();
 
 // Generate full risk report for a protocol
 function analyzeProtocol(data: ProtocolData): ProtocolRiskReport {
   const economic = economicAnalyzer.analyze(data);
   const governance = governanceAnalyzer.analyze(data);
   const mev = mevAnalyzer.analyze(data);
+  const liquidity = liquidityAnalyzer.analyze(data);
   
-  // Placeholder for remaining analyzers
-  const liquidity = { name: 'Liquidity Risk', score: 0, severity: 'low' as const, findings: [] };
+  // Placeholder for remaining analyzer
   const composability = { name: 'Composability Risk', score: 0, severity: 'low' as const, findings: [] };
 
   const categories = { economic, governance, liquidity, composability, mev };
