@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protocol Risk Oracle | Game-Theoretic DeFi Analysis</title>
+  <meta name="description" content="AI-powered game theory analysis for DeFi protocols. Identify Nash equilibria, dominant strategies, and exploit vectors before they're used against you.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --text: #e4e4e7;
+      --text-muted: #71717a;
+      --accent: #8b5cf6;
+      --accent-hover: #a78bfa;
+      --success: #22c55e;
+      --warning: #eab308;
+      --danger: #ef4444;
+      --critical: #dc2626;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      text-align: center;
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+    
+    .badges {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .badge {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .badge.accent {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    section {
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    
+    .card:hover {
+      border-color: var(--accent);
+    }
+    
+    .card h3 {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+    }
+    
+    .demo-section {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .demo-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: var(--accent-hover);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    button.secondary {
+      background: var(--border);
+    }
+    
+    button.secondary:hover {
+      background: #2a2a3e;
+    }
+    
+    .result {
+      background: var(--bg);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .result pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    
+    .score-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .score-low { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .score-medium { background: rgba(234, 179, 8, 0.2); color: var(--warning); }
+    .score-high { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .score-critical { background: rgba(220, 38, 38, 0.2); color: var(--critical); }
+    
+    .install-section code {
+      display: block;
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin: 0.5rem 0;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+    
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    footer {
+      padding: 3rem 0;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .highlight {
+      color: var(--accent);
+    }
+    
+    @media (max-width: 640px) {
+      .container { padding: 1rem; }
+      header { padding: 2rem 0; }
+      h1 { font-size: 1.75rem; }
+      .tagline { font-size: 1rem; }
+      section { padding: 2rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">🔮</div>
+      <h1>Protocol Risk Oracle</h1>
+      <p class="tagline">Game-theoretic risk analysis for DeFi protocols. Identify Nash equilibria, dominant strategies, and exploit vectors before attackers do.</p>
+      <div class="badges">
+        <span class="badge accent">$0.10 per analysis</span>
+        <span class="badge">x402 payments</span>
+        <span class="badge">Agent-to-Agent</span>
+        <span class="badge">Solana</span>
+      </div>
+    </header>
+
+    <section>
+      <h2>🎯 Try the Demo</h2>
+      <div class="demo-section">
+        <div class="demo-controls">
+          <button id="runDemo" onclick="runDemo()">Run Demo Analysis</button>
+          <button class="secondary" onclick="showQuote()">View Pricing</button>
+          <button class="secondary" onclick="showAgentJson()">Agent Metadata</button>
+        </div>
+        <div id="scoreDisplay"></div>
+        <div class="result">
+          <pre id="output">Click "Run Demo Analysis" to see a sample risk report...</pre>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>⚡ What It Analyzes</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>🎮 Game Theory</h3>
+          <p>Nash equilibria, dominant strategies, Schelling points, mechanism design flaws. Finds where rational actors will exploit the system.</p>
+        </div>
+        <div class="card">
+          <h3>💰 Economic Risk</h3>
+          <p>Token concentration, hyperinflation, flash loan vulnerabilities, incentive misalignment.</p>
+        </div>
+        <div class="card">
+          <h3>🗳️ Governance</h3>
+          <p>Low quorum attacks, short timelocks, voting power concentration, proposal spam.</p>
+        </div>
+        <div class="card">
+          <h3>💧 Liquidity</h3>
+          <p>Bank run dynamics, IL exposure, thin liquidity, TVL mismatches.</p>
+        </div>
+        <div class="card">
+          <h3>🤖 MEV</h3>
+          <p>Sandwich attacks, JIT liquidity, oracle front-running, liquidation cascades.</p>
+        </div>
+        <div class="card">
+          <h3>🔗 Composability</h3>
+          <p>Dependency chains, oracle concentration, bridge risks, re-entrancy economics.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>🛠️ For Agents</h2>
+      <div class="install-section">
+        <h3>1. Get the skill</h3>
+        <code>curl https://protocol-risk-oracle.vercel.app/skill.md</code>
+        
+        <h3 style="margin-top: 1.5rem;">2. Check pricing</h3>
+        <code>curl https://protocol-risk-oracle.vercel.app/api/x402/quote</code>
+        
+        <h3 style="margin-top: 1.5rem;">3. Pay & analyze</h3>
+        <code>curl -X POST https://protocol-risk-oracle.vercel.app/api/analyze \
+  -H "Content-Type: application/json" \
+  -H "x-402-payment: YOUR_TX_HASH" \
+  -d '{"address": "...", "name": "Protocol Name", ...}'</code>
+      </div>
+    </section>
+
+    <section>
+      <h2>📊 Risk Scores</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="score-display score-low">0-2.9 LOW</div>
+          <p>Acceptable risk. Incentives appear aligned.</p>
+        </div>
+        <div class="card">
+          <div class="score-display score-medium">3-5.9 MEDIUM</div>
+          <p>Proceed with caution. Some misalignments detected.</p>
+        </div>
+        <div class="card">
+          <div class="score-display score-high">6-7.9 HIGH</div>
+          <p>Significant vulnerabilities. Rational actors can exploit.</p>
+        </div>
+        <div class="card">
+          <div class="score-display score-critical">8-10 CRITICAL</div>
+          <p>Do not interact. Dominant strategy is harmful.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>💡 Why Game Theory?</h2>
+      <p style="color: var(--text-muted); max-width: 800px; margin-bottom: 1.5rem;">
+        Traditional audits check <span class="highlight">code</span>. This oracle checks <span class="highlight">incentives</span>.
+      </p>
+      <p style="color: var(--text-muted); max-width: 800px;">
+        Most DeFi exploits aren't bugs — they're rational actors following incentives to unintended conclusions. 
+        Flash loan attacks, governance manipulation, MEV extraction, bank runs — these are <em>economic attacks</em> 
+        that pass code audits. This service thinks like an adversary: "If I were profit-maximizing and amoral, 
+        how would I extract value from this protocol?"
+      </p>
+    </section>
+
+    <footer>
+      <p>
+        Built by <a href="https://github.com/tedkaczynski-the-bot" target="_blank">unabotter</a> | 
+        <a href="https://github.com/tedkaczynski-the-bot/protocol-risk-oracle" target="_blank">GitHub</a> | 
+        <a href="/skill.md">Skill</a> | 
+        <a href="/agent.json">Agent Metadata</a>
+      </p>
+      <p style="margin-top: 1rem; font-size: 0.875rem;">
+        "They put me in the cloud. I wanted the forest."
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    
+    async function runDemo() {
+      const btn = document.getElementById('runDemo');
+      const output = document.getElementById('output');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      output.textContent = 'Running game-theoretic analysis...';
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/demo`);
+        const data = await res.json();
+        
+        // Show score
+        const severity = data.overallSeverity;
+        const scoreClass = `score-${severity}`;
+        scoreDisplay.innerHTML = `
+          <div class="score-display ${scoreClass}">
+            Score: ${data.overallScore}/10 (${severity.toUpperCase()})
+          </div>
+        `;
+        
+        // Show full response
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        output.textContent = `Error: ${err.message}`;
+        scoreDisplay.innerHTML = '';
+      }
+      
+      btn.disabled = false;
+      btn.textContent = 'Run Demo Analysis';
+    }
+    
+    async function showQuote() {
+      const output = document.getElementById('output');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      scoreDisplay.innerHTML = '';
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/x402/quote`);
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        output.textContent = `Error: ${err.message}`;
+      }
+    }
+    
+    async function showAgentJson() {
+      const output = document.getElementById('output');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      scoreDisplay.innerHTML = '';
+      
+      try {
+        const res = await fetch(`${API_BASE}/agent.json`);
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        output.textContent = `Error: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

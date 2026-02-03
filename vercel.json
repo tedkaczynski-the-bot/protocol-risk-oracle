@@ -4,12 +4,32 @@
     {
       "src": "api/index.ts",
       "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "/api/index.ts"
+    },
+    {
+      "src": "/agent.json",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/skill.md",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/docs/(.*)",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
     }
   ]
 }
